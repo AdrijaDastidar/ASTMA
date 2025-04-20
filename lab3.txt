@@ -106,3 +106,17 @@ similarity_score = calculate_similarity(text1, text2)
 print(f"Similarity Score: {similarity_score:.4f}")
 similar_words = find_similar_words(text1, text2)
 print(f"Common Words: {similar_words}")
+
+def calculate_jaccard_similarity(text1, text2):
+    words1 = set(preprocess_text(text1).split())
+    words2 = set(preprocess_text(text2).split())
+
+    intersection = words1.intersection(words2)
+    union = words1.union(words2)
+
+    if not union:
+        return 0.0
+
+    return len(intersection) / len(union)
+jaccard_score = calculate_jaccard_similarity(text1, text2)
+print(f"Jaccard Similarity Score: {jaccard_score:.4f}")
