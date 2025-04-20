@@ -1,0 +1,31 @@
+# Import libraries
+import networkx as nx
+import matplotlib.pyplot as plt
+# Step 1: Create a directed graph (links have direction)
+G = nx.DiGraph()
+# Step 2: Add edges between "web pages"
+# Each tuple (A, B) means: Page A links to Page B
+G.add_edges_from([
+    ("Page A", "Page B"),
+    ("Page A", "Page C"),
+    ("Page B", "Page C"),
+    ("Page C", "Page A"),
+    ("Page D", "Page C"),
+    ("Page E", "Page C"),
+    ("Page E", "Page D"),
+])
+# Step 3: Draw the network
+plt.figure(figsize=(10, 6))
+pos = nx.spring_layout(G, seed=42)  # For a consistent layout every time
+nx.draw_networkx_nodes(G, pos, node_color="skyblue", node_size=2500)
+nx.draw_networkx_edges(G, pos, arrowstyle="->", arrowsize=25, edge_color='gray')
+nx.draw_networkx_labels(G, pos, font_size=12, font_weight='bold')
+plt.title("🔗 Link Network of Web Pages", fontsize=16)
+plt.axis("off")
+plt.show()
+# Step 4: Calculate PageRank
+pagerank_scores = nx.pagerank(G)
+# Step 5: Print the PageRank scores
+print("📊 PageRank Scores:")
+for page, score in sorted(pagerank_scores.items(), key=lambda x: x[1], reverse=True):
+    print(f'{page}: {score:.4f}')

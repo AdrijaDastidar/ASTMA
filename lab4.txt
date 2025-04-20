@@ -1,0 +1,65 @@
+!pip install textblob pandas openpyxl nltk
+import pandas as pd
+import re
+from textblob import TextBlob
+
+file_path = "E:\codeforces\social_media_engagement_data.xlsx"  # Update this path if necessary
+df = pd.read_excel(file_path, sheet_name="social_media_engagement_data")
+
+df_sentiment = df[['Platform', 'Post Content']].dropna()  # Remove rows with empty text
+
+def clean_text(text):
+    text = str(text).lower()
+    text = re.sub(r"http\S+|www\S+|https\S+", '', text, flags=re.MULTILINE)
+    text = re.sub(r'@\w+|#', '', text)
+    text = re.sub(r'[^A-Za-z0-9 ]+', '', text)
+    return text
+
+df_sentiment['Cleaned Content'] = df_sentiment['Post Content'].apply(clean_text)
+
+def get_sentiment(text):
+    analysis = TextBlob(text)
+    polarity = analysis.sentiment.polarity
+    if polarity > 0:
+        return 'Positive'
+    elif polarity < 0:
+        return 'Negative'
+    else:
+        return 'Neutral'
+
+df_sentiment['Sentiment'] = df_sentiment['Cleaned Content'].apply(get_sentiment)
+
+df_sentiment.to_excel("sentiment_analysis_results.xlsx", index=False)
+
+print(df_sentiment.head())
+
+import nltk
+import spacy
+from nltk.sentiment import SentimentIntensityAnalyzer
+
+# Download necessary resources - python -m spacy download en_core_web_sm
+
+nltk.download('vader_lexicon')
+nlp = spacy.load("en_core_web_sm")
+sia = SentimentIntensityAnalyzer()
+def analyze_sentiment(text):
+    """Analyze sentiment using VADER."""
+    sentiment_scores = sia.polarity_scores(text)
+    if sentiment_scores['compound'] >= 0.05:
+        return "Positive"
+    elif sentiment_scores['compound'] <= -0.05:
+
+        return "Negative"
+    else:
+        return "Neutral"
+def apply_ner_tagging(text):
+    """Apply Named Entity Recognition (NER) tagging using spaCy."""
+    doc = nlp(text)
+    entities = [(ent.text, ent.label_) for ent in doc.ents]
+    return entities
+social_text = "i will kill you"
+
+sentiment = analyze_sentiment(social_text)
+entities = apply_ner_tagging(social_text)
+print(f"Sentiment: {sentiment}")
+print("Entities:", entities)

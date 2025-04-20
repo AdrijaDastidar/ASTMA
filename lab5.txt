@@ -1,0 +1,76 @@
+import nltk
+nltk.data.path.append('/root/nltk_data')  # Add this if needed
+nltk.download('punkt', download_dir='/root/nltk_data')
+nltk.download('stopwords', download_dir='/root/nltk_data')
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import re
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+import pandas as pd
+
+# Load dataset
+path = "E:\\codeforces\\test.csv"  
+df = pd.read_csv(path, encoding='latin1')
+
+# Handle missing values
+df.dropna(subset=['text', 'sentiment'], inplace=True)  
+df['text'] = df['text'].astype(str)  
+
+print(df.head())
+print(df['sentiment'].value_counts())
+# Preprocessing function
+def clean_text(text):
+    text = text.lower()
+    text = re.sub(r'http\S+', '', text)  # Remove URLs
+    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)  # Remove special characters
+    tokens = re.findall(r'\b\w+\b', text)  # Tokenization
+    tokens = [word for word in tokens if word not in stopwords.words('english')]
+    ps = PorterStemmer()
+    tokens = [ps.stem(word) for word in tokens]
+    return " ".join(tokens)
+
+df['cleaned_text'] = df['text'].apply(clean_text)
+# Convert labels to numeric
+df['sentiment'] = df['sentiment'].map({'positive': 1, 'neutral': 0, 'negative': -1})
+
+# Visualizing Sentiment Distribution
+sns.countplot(x=df['sentiment'])
+plt.title("Sentiment Distribution")
+plt.xlabel("Sentiment")
+plt.ylabel("Count")
+plt.show()
+# Splitting data
+X_train, X_test, y_train, y_test = train_test_split(df['cleaned_text'], df['sentiment'], test_size=0.2, random_state=42)
+
+# Vectorizing text
+vectorizer = TfidfVectorizer()
+X_train_vect = vectorizer.fit_transform(X_train)
+X_test_vect = vectorizer.transform(X_test)
+
+# Model Training
+model = LogisticRegression()
+model.fit(X_train_vect, y_train)
+
+# Predictions
+y_pred = model.predict(X_test_vect)
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+# Function for sentiment prediction
+def predict_sentiment(text):
+    cleaned_text = clean_text(text)
+    vectorized_text = vectorizer.transform([cleaned_text])
+    sentiment = model.predict(vectorized_text)[0]
+    sentiment_label = {1: 'Positive', 0: 'Neutral', -1: 'Negative'}
+    return sentiment_label[sentiment]
+
+# Example Usage
+user_input = input("Enter a phrase to analyze sentiment: ")
+print("Predicted Sentiment:", predict_sentiment(user_input))

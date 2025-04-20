@@ -1,0 +1,68 @@
+# Sample text
+sample_text = '''
+A mango is an edible stone fruit produced by the tropical tree Mangifera indica.
+'''
+
+# Convert to lowercase
+lower_case = sample_text.lower()
+print(lower_case)
+# Remove punctuation
+punctuations = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
+no_punct = ""
+for char in lower_case:
+    if char not in punctuations:
+        no_punct += char
+print(no_punct)
+# Tokenize using split
+tokens = no_punct.split()
+print(tokens)
+import nltk
+from nltk.corpus import stopwords
+nltk.download('stopwords')
+
+# Load stopwords and add custom ones
+stop_words = stopwords.words('english')
+stop_words.append('work')
+print(stop_words)
+import string
+
+def text_preprocessing_pipeline(text):
+    text = text.lower()
+    text = text.translate(str.maketrans("", "", string.punctuation))
+    tokens = text.split()
+    stop_words = set(stopwords.words('english'))
+    filtered_tokens = [word for word in tokens if word not in stop_words]
+    return filtered_tokens
+
+# Run pipeline
+sample_text = '''
+A mango is an edible stone fruit produced by the tropical tree Mangifera indica. It originated in India.
+M. indica has been cultivated in South and Southeast Asia since ancient times.
+'''
+processed_tokens = text_preprocessing_pipeline(sample_text)
+print(processed_tokens)
+# Text Filtering using Pandas
+import pandas as pd
+
+data = {
+    'Customer_ID': ['ABC', 'DEF', 'GHI'],
+    'City': ['Pune', 'Mumbai', 'Pune']
+}
+df = pd.DataFrame(data)
+criteria = ['Pune']
+filtered_df = df[df['City'].isin(criteria)]
+print(filtered_df)
+# Script Validation
+paragraph = """
+A mango is an edible stone fruit produced by the tropical tree Mangifera indica.
+M. indica has been cultivated in South and Southeast Asia since ancient times.
+"""
+
+def validate_script(script):
+    if script.lower() in paragraph.lower():
+        print('Script Valid')
+    else:
+        print('Script Not Valid')
+
+user_input = input("Enter a keyword from the paragraph: ")
+validate_script(user_input)

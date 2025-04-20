@@ -1,0 +1,40 @@
+import re
+import nltk
+from nltk.corpus import stopwords
+
+# Download stopwords if not already downloaded
+nltk.download('stopwords')
+
+# Function to remove stopwords
+def remove_stopwords(text):
+    words = re.findall(r'\b\w+\b', text.lower())
+    stop_words = set(stopwords.words('english'))
+    filtered_words = [word for word in words if word not in stop_words]
+    return ' '.join(filtered_words)
+# Take input from the user
+input_text = input("Enter a sentence: ")
+output_text = remove_stopwords(input_text)
+print("Output (after stopword removal):", output_text)
+# Stemming
+import nltk
+nltk.download('punkt_tab')
+nltk.download('wordnet')
+from nltk.stem import PorterStemmer
+
+stemmer = PorterStemmer()
+input_str = "There are several types of stemming algorithms."
+tokens = nltk.word_tokenize(input_str)
+
+for word in tokens:
+    print(stemmer.stem(word))
+# Lemmatization
+from nltk.stem import WordNetLemmatizer
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+lemmatizer = WordNetLemmatizer()
+input_str = "There are several types of stemming algorithms."
+tokens = nltk.word_tokenize(input_str)
+
+for word in tokens:
+    print(lemmatizer.lemmatize(word))
